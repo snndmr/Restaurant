@@ -7,6 +7,6 @@ namespace Restaurant.Services.ProductAPI.DbContexts
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        private DbSet<Product> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }
