@@ -5,12 +5,7 @@ namespace Restaurant.Web.Services
 {
     public class ProductService : BaseService, IProductService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-
-        public ProductService(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-        {
-            _httpClientFactory = httpClientFactory;
-        }
+        public ProductService(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
         public async Task<T> CreateProductAsync<T>(ProductDto productDto)
         {
@@ -18,7 +13,7 @@ namespace Restaurant.Web.Services
             {
                 ApiType = StaticDetails.APIType.POST,
                 Data = productDto,
-                Url = StaticDetails.ProductAPIBase + "/api/products",
+                Url = StaticDetails.ProductAPIBase + "/api/ProductAPI",
                 AccessToken = string.Empty,
             });
         }
@@ -28,7 +23,7 @@ namespace Restaurant.Web.Services
             return await SendAsync<T>(new ApiRequest()
             {
                 ApiType = StaticDetails.APIType.DELETE,
-                Url = StaticDetails.ProductAPIBase + "/api/products/" + id,
+                Url = StaticDetails.ProductAPIBase + "/api/ProductAPI/" + id,
                 AccessToken = string.Empty,
             });
         }
@@ -38,7 +33,7 @@ namespace Restaurant.Web.Services
             return await SendAsync<T>(new ApiRequest()
             {
                 ApiType = StaticDetails.APIType.GET,
-                Url = StaticDetails.ProductAPIBase + "/api/products",
+                Url = StaticDetails.ProductAPIBase + "/api/ProductAPI",
                 AccessToken = string.Empty,
             });
         }
@@ -49,7 +44,7 @@ namespace Restaurant.Web.Services
             {
                 ApiType = StaticDetails.APIType.GET,
                 Data = id,
-                Url = StaticDetails.ProductAPIBase + "/api/products/" + id,
+                Url = StaticDetails.ProductAPIBase + "/api/ProductAPI/" + id,
                 AccessToken = string.Empty,
             });
         }
@@ -60,7 +55,7 @@ namespace Restaurant.Web.Services
             {
                 ApiType = StaticDetails.APIType.PUT,
                 Data = productDto,
-                Url = StaticDetails.ProductAPIBase + "/api/products",
+                Url = StaticDetails.ProductAPIBase + "/api/ProductAPI",
                 AccessToken = string.Empty,
             });
         }

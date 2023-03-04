@@ -4,7 +4,7 @@ namespace Restaurant.Web.Services.IServices
 {
     public interface IBaseService : IDisposable
     {
-        ResponseDto responseDto { get; set; }
+        ResponseDto ResponseDto { get; set; }
 
         Task<T> SendAsync<T>(ApiRequest apiRequest);
     }

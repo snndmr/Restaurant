@@ -7,13 +7,13 @@ namespace Restaurant.Web.Services
 {
     public class BaseService : IBaseService
     {
-        public IHttpClientFactory httpClient { get; set; }
-        public ResponseDto responseDto { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private IHttpClientFactory HttpClient { get; set; }
+        public ResponseDto ResponseDto { get; set; }
 
         public BaseService(IHttpClientFactory httpClientFactory)
         {
-            httpClient = httpClientFactory;
-            responseDto = new ResponseDto();
+            HttpClient = httpClientFactory;
+            ResponseDto = new ResponseDto();
         }
 
         public async Task<T> SendAsync<T>(ApiRequest apiRequest)
@@ -22,7 +22,7 @@ namespace Restaurant.Web.Services
 
             try
             {
-                HttpClient client = httpClient.CreateClient("RestaurantAPI");
+                HttpClient client = HttpClient.CreateClient("RestaurantAPI");
 
                 HttpRequestMessage message = new HttpRequestMessage();
                 message.Headers.Add("Accept", "application/json");
