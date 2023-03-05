@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Services.Identity;
 using Restaurant.Services.Identity.DbContexts;
+using Restaurant.Services.Identity.Initializer;
 using Restaurant.Services.Identity.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +26,16 @@ builder.Services.AddIdentityServer(options =>
     .AddAspNetIdentity<ApplicationUser>()
     .AddDeveloperSigningCredential();
 
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
 var app = builder.Build();
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    IServiceProvider services = serviceScope.ServiceProvider;
+    IDbInitializer dependency = services.GetRequiredService<IDbInitializer>();
+    dependency.Initialize();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
