@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Restaurant.Web;
 using Restaurant.Web.Services;
 using Restaurant.Web.Services.IServices;
@@ -6,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient<IProductService, ProductService>();
+StaticDetails.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -22,13 +27,11 @@ builder.Services.AddAuthentication(options =>
         options.ResponseType = "code";
         options.TokenValidationParameters.NameClaimType = "name";
         options.TokenValidationParameters.RoleClaimType = "role";
+        options.ClaimActions.MapJsonKey("role", "role", "role");
+        options.ClaimActions.MapJsonKey("sub", "sub", "sub");
         options.Scope.Add("restaurant");
         options.SaveTokens = true;
     });
-
-builder.Services.AddHttpClient<IProductService, ProductService>();
-StaticDetails.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
-builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

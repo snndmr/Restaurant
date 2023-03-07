@@ -20,6 +20,7 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
         ValidateAudience = false
     };
 });
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiScope", policy =>
@@ -77,7 +78,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

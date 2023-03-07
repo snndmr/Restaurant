@@ -1,9 +1,11 @@
+using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Services.Identity;
 using Restaurant.Services.Identity.DbContexts;
 using Restaurant.Services.Identity.Initializer;
 using Restaurant.Services.Identity.Models;
+using Restaurant.Services.Identity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,7 @@ builder.Services.AddIdentityServer(options =>
     .AddDeveloperSigningCredential();
 
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
 
