@@ -19,7 +19,6 @@ namespace Restaurant.Services.ProductAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<object> Get()
         {
             try
