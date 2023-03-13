@@ -8,8 +8,7 @@ namespace Restaurant.Services.ProductAPI
     {
         public static MapperConfiguration RegisterMaps()
         {
-            return new(config =>
-            config.CreateMap<Product, ProductDto>().ReverseMap());
+            return new(config => config.CreateMap<Product, ProductDto>().ReverseMap());
         }
     }
 }
