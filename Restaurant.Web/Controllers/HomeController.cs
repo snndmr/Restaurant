@@ -12,11 +12,13 @@ namespace Restaurant.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
+        private readonly ICartService _cartService;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService)
+        public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService)
         {
             _logger = logger;
             _productService = productService;
+            _cartService = cartService;
         }
 
         public async Task<IActionResult> Index()
@@ -66,7 +68,44 @@ namespace Restaurant.Web.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Login()
+        [HttpPost]
+        [ActionName("Details")]
+        public async Task<IActionResult> DetailsPost(ProductDto productDto)
+        {
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            CartDetailDto cartDetailDto = new()
+            {
+                Count = productDto.Count,
+                ProductId = productDto.Id,
+                CartHeader = new() { UserId = User.Claims.Where(x => x.Type.Equals("sub"))?.FirstOrDefault()?.Value },
+            };
+
+            ResponseDto responseDto = await _productService.GetProductByIdAsync<ResponseDto>(productDto.Id, accessToken ?? string.Empty);
+
+            if (responseDto?.IsSuccess == true)
+            {
+                cartDetailDto.Product = JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(responseDto.Result));
+            }
+
+            CartDto cartDto = new()
+            {
+                CartHeader = new() { UserId = User.Claims.Where(x => x.Type.Equals("sub"))?.FirstOrDefault()?.Value },
+                CartDetails = new List<CartDetailDto>() { cartDetailDto }
+            };
+
+            var addToCartResponseDto = await _cartService.AddToCartAsync<ResponseDto>(cartDto, accessToken ?? string.Empty);
+
+            if (responseDto?.IsSuccess == true)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(productDto);
+        }
+
+        [Authorize]
+        public IActionResult Login()
         {
             return RedirectToAction(nameof(Index));
         }

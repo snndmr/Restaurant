@@ -18,7 +18,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
         }
 
         [HttpGet("GetCart/{userId}")]
-        public async Task<object> GetCartAsync(int userId)
+        public async Task<object> GetCartAsync(string userId)
         {
             try
             {

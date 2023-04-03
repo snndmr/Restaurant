@@ -4,9 +4,9 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
 {
     public interface ICartRepository
     {
-        Task<CartDto> GetCartByUserId(int userId);
+        Task<CartDto> GetCartByUserId(string userId);
         Task<CartDto> CreateUpdateCart(CartDto cartDto);
         Task<bool> RemoveFromCart(int cartDetailId);
-        Task<bool> ClearCart(int userId);
+        Task<bool> ClearCart(string userId);
     }
 }

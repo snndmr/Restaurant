@@ -17,7 +17,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
             _mapper = mapper;
         }
 
-        public async Task<bool> ClearCart(int userId)
+        public async Task<bool> ClearCart(string userId)
         {
             CartHeader header = await _dbContext.CartHeaders.FirstAsync(x => x.UserId == userId);
 
@@ -42,7 +42,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
                 return cartDto;
             }
 
-            Product product = _dbContext.Products.First(q => q .Id == cartDto.CartDetails.First().ProductId);
+            Product product = _dbContext.Products.FirstOrDefault(q => q .Id == cartDto.CartDetails.FirstOrDefault().ProductId);
 
             if (product == null)
             {
@@ -50,34 +50,34 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
                 await _dbContext.SaveChangesAsync();
             }
 
-            CartHeader cartHeader = _dbContext.CartHeaders.AsNoTracking().First(q => q.UserId == cart.CartHeader.UserId);
+            CartHeader cartHeader = _dbContext.CartHeaders.AsNoTracking().FirstOrDefault(q => q.UserId == cart.CartHeader.UserId);
 
             if (cartHeader == null)
             {
                 _dbContext.CartHeaders.Add(cart.CartHeader);
                 await _dbContext.SaveChangesAsync();
-                cart.CartDetails.First().CartHeaderId = cart.CartHeader.Id;
-                cart.CartDetails.First().Product = null;
-                _dbContext.CartDetails.Add(cart.CartDetails.First());
+                cart.CartDetails.FirstOrDefault().CartHeaderId = cart.CartHeader.Id;
+                cart.CartDetails.FirstOrDefault().Product = null;
+                _dbContext.CartDetails.Add(cart.CartDetails.FirstOrDefault());
                 await _dbContext.SaveChangesAsync();
             }
             else
             {
-                CartDetail cartDetail= _dbContext.CartDetails.AsNoTracking().First(q =>
-                q.ProductId == cart.CartDetails.First().ProductId && q.CartHeaderId == cartHeader.Id);
+                CartDetail cartDetail= _dbContext.CartDetails.AsNoTracking().FirstOrDefault(q =>
+                q.ProductId == cart.CartDetails.FirstOrDefault().ProductId && q.CartHeaderId == cartHeader.Id);
 
                 if (cartDetail == null)
                 {
-                    cart.CartDetails.First().CartHeaderId = cartHeader.Id;
-                    cart.CartDetails.First().Product = null;
-                    _dbContext.CartDetails.Add(cart.CartDetails.First());
+                    cart.CartDetails.FirstOrDefault().CartHeaderId = cartHeader.Id;
+                    cart.CartDetails.FirstOrDefault().Product = null;
+                    _dbContext.CartDetails.Add(cart.CartDetails.FirstOrDefault());
                     await _dbContext.SaveChangesAsync();
                 }
                 else
                 {
-                    cart.CartDetails.First().Product = null;
-                    cart.CartDetails.First().Count += cartDetail.Count;
-                    _dbContext.CartDetails.Update(cart.CartDetails.First());
+                    cart.CartDetails.FirstOrDefault().Product = null;
+                    cart.CartDetails.FirstOrDefault().Count += cartDetail.Count;
+                    _dbContext.CartDetails.Update(cart.CartDetails.FirstOrDefault());
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -85,11 +85,11 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
             return _mapper.Map<CartDto>(cart);
         }
 
-        public async Task<CartDto> GetCartByUserId(int userId)
+        public async Task<CartDto> GetCartByUserId(string userId)
         {
             Cart cart = new()
             {
-                CartHeader = await _dbContext.CartHeaders.FirstAsync(x => x.UserId == userId)
+                CartHeader = await _dbContext.CartHeaders.FirstOrDefaultAsync(x => x.UserId == userId)
             };
 
             cart.CartDetails = _dbContext.CartDetails.Where(x => x.CartHeaderId.Equals(cart.CartHeader.Id)).Include(x => x.Product);
@@ -101,7 +101,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
         {
             try
             {
-                CartDetail cartDetail = await _dbContext.CartDetails.FirstAsync(x => x.Id.Equals(cartDetailId));
+                CartDetail cartDetail = await _dbContext.CartDetails.FirstOrDefaultAsync(x => x.Id.Equals(cartDetailId));
 
                 int totalCountOfCartItems = _dbContext.CartDetails.Where(x => x.CartHeaderId.Equals(cartDetail.CartHeaderId)).Count();
 
@@ -109,7 +109,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
 
                 if (totalCountOfCartItems == 1)
                 {
-                    CartHeader header = await _dbContext.CartHeaders.FirstAsync(x => x.Id == cartDetail.CartHeaderId);
+                    CartHeader header = await _dbContext.CartHeaders.FirstOrDefaultAsync(x => x.Id == cartDetail.CartHeaderId);
                     _dbContext.CartHeaders.Remove(header);
                 }
 
