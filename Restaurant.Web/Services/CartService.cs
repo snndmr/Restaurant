@@ -18,7 +18,7 @@ namespace Restaurant.Web.Services
             });
         }
 
-        public async Task<T> GetCartByUserIdAsync<T>(int userId, string accessToken)
+        public async Task<T> GetCartByUserIdAsync<T>(string userId, string accessToken)
         {
             return await SendAsync<T>(new ApiRequest()
             {
