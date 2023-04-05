@@ -10,16 +10,62 @@ namespace Restaurant.Web.Controllers
     {
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
+        private readonly ICouponService _couponService;
 
-        public CartController(ICartService cartService, IProductService productService)
+        public CartController(ICartService cartService, IProductService productService, ICouponService couponService)
         {
             _cartService = cartService;
             _productService = productService;
+            _couponService = couponService;
         }
 
         public async Task<IActionResult> CartIndex()
         {
             return View(await LoadCartDtoBasedOnLoggedInUser());
+        }
+
+        [HttpPost]
+        [ActionName("ApplyCoupon")]
+        public async Task<IActionResult> ApplyCoupon(CartDto cartDto)
+        {
+            string? userId = User.Claims.Where(q => q.Type == "sub").FirstOrDefault()?.Value;
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(accessToken))
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+
+            ResponseDto response = await _cartService.ApplyCouponAsync<ResponseDto>(cartDto, accessToken);
+
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("RemoveCoupon")]
+        public async Task<IActionResult> RemoveCoupon(CartDto cartDto)
+        {
+            string? userId = User.Claims.Where(q => q.Type == "sub").FirstOrDefault()?.Value;
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(accessToken))
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+
+            ResponseDto response = await _cartService.RemoveCouponAsync<ResponseDto>(userId, accessToken);
+
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(CartIndex));
+            }
+
+            return View();
         }
 
         public async Task<IActionResult> Remove(int cartDetailsId)
@@ -65,10 +111,23 @@ namespace Restaurant.Web.Controllers
 
             if (cartDto?.CartHeader != null)
             {
+                if (!string.IsNullOrEmpty(cartDto.CartHeader.CouponCode))
+                {
+                    ResponseDto couponResponse = await _couponService.GetCoupon<ResponseDto>(cartDto.CartHeader.CouponCode, accessToken);
+
+                    if (couponResponse != null && couponResponse.IsSuccess)
+                    {
+                        CouponDto couponDto = JsonConvert.DeserializeObject<CouponDto>(Convert.ToString(couponResponse.Result));
+                        cartDto.CartHeader.DiscountTotal = couponDto.DiscountAmount;
+                    }
+                }
+
                 foreach (CartDetailDto cartDetail in cartDto.CartDetails)
                 {
                     cartDto.CartHeader.OrderTotal += cartDetail.Product.Price * cartDetail.Count;
                 }
+
+                cartDto.CartHeader.OrderTotal -= cartDto.CartHeader.DiscountTotal;
             }
 
             return cartDto;

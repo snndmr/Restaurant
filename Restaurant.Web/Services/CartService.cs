@@ -7,13 +7,24 @@ namespace Restaurant.Web.Services
     {
         public CartService(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
-        public async Task<T> AddToCartAsync<T>(CartDto cardDto, string accessToken)
+        public async Task<T> AddToCartAsync<T>(CartDto cartDto, string accessToken)
         {
             return await SendAsync<T>(new ApiRequest()
             {
                 ApiType = StaticDetails.APIType.POST,
-                Data = cardDto,
+                Data = cartDto,
                 Url = StaticDetails.ShoppingCartAPIBase + "/api/cart/AddCart",
+                AccessToken = accessToken,
+            });
+        }
+
+        public async Task<T> ApplyCouponAsync<T>(CartDto cartDto, string accessToken)
+        {
+            return await SendAsync<T>(new ApiRequest()
+            {
+                ApiType = StaticDetails.APIType.POST,
+                Data = cartDto,
+                Url = StaticDetails.ShoppingCartAPIBase + "/api/cart/ApplyCoupon",
                 AccessToken = accessToken,
             });
         }
@@ -39,12 +50,23 @@ namespace Restaurant.Web.Services
             });
         }
 
-        public async Task<T> UpdateCartAsync<T>(CartDto cardDto, string accessToken)
+        public async Task<T> RemoveCouponAsync<T>(string userId, string accessToken)
         {
             return await SendAsync<T>(new ApiRequest()
             {
                 ApiType = StaticDetails.APIType.POST,
-                Data = cardDto,
+                Data = userId,
+                Url = StaticDetails.ShoppingCartAPIBase + "/api/cart/RemoveCoupon",
+                AccessToken = accessToken,
+            });
+        }
+
+        public async Task<T> UpdateCartAsync<T>(CartDto cartDto, string accessToken)
+        {
+            return await SendAsync<T>(new ApiRequest()
+            {
+                ApiType = StaticDetails.APIType.POST,
+                Data = cartDto,
                 Url = StaticDetails.ShoppingCartAPIBase + "/api/cart/UpdateCart",
                 AccessToken = accessToken,
             });

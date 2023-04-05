@@ -80,5 +80,37 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
 
             return _responseDto;
         }
+
+        [HttpPost("ApplyCoupon")]
+        public async Task<object> ApplyCoupon([FromBody] CartDto cartDto)
+        {
+            try
+            {
+                _responseDto.Result = await _cartRepository.ApplyCoupon(cartDto.CartHeader.UserId, cartDto.CartHeader.CouponCode);
+            }
+            catch (Exception ex)
+            {
+                _responseDto.IsSuccess = false;
+                _responseDto.ErrorMessages = new List<string>() { ex.ToString() };
+            }
+
+            return _responseDto;
+        }
+
+        [HttpPost("RemoveCoupon")]
+        public async Task<object> RemoveCoupon([FromBody] string userId)
+        {
+            try
+            {
+                _responseDto.Result = await _cartRepository.RemoveCoupon(userId);
+            }
+            catch (Exception ex)
+            {
+                _responseDto.IsSuccess = false;
+                _responseDto.ErrorMessages = new List<string>() { ex.ToString() };
+            }
+
+            return _responseDto;
+        }
     }
 }

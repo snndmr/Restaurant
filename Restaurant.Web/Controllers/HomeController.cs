@@ -78,7 +78,6 @@ namespace Restaurant.Web.Controllers
             {
                 Count = productDto.Count,
                 ProductId = productDto.Id,
-                CartHeader = new() { UserId = User.Claims.Where(x => x.Type.Equals("sub"))?.FirstOrDefault()?.Value },
             };
 
             ResponseDto responseDto = await _productService.GetProductByIdAsync<ResponseDto>(productDto.Id, accessToken ?? string.Empty);
