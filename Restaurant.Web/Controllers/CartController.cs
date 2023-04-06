@@ -90,6 +90,12 @@ namespace Restaurant.Web.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
+        {
+            return View(await LoadCartDtoBasedOnLoggedInUser());
+        }
+
         private async Task<CartDto> LoadCartDtoBasedOnLoggedInUser()
         {
             string? userId = User.Claims.Where(q => q.Type == "sub").FirstOrDefault()?.Value;

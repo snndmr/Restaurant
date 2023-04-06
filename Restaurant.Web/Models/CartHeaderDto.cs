@@ -16,6 +16,10 @@
 
         public string? LastName { get; set; }
 
+        public DateTime PickupDateTime { get; set; }
+
+        public string? Phone { get; set; }
+
         public string? EmailAddress { get; set; }
 
         public string? CardNumber { get; set; }
