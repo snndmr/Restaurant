@@ -10,5 +10,6 @@ namespace Restaurant.Web.Services.IServices
         Task<T> RemoveCartAsync<T>(int cartId, string accessToken);
         Task<T> ApplyCouponAsync<T>(CartDto cartDto, string accessToken);
         Task<T> RemoveCouponAsync<T>(string userId, string accessToken);
+        Task<T> CheckoutAsync<T>(CartHeaderDto cartHeaderDto, string accessToken);
     }
 }
