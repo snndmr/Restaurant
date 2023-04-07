@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Restaurant.MessageBus;
 using Restaurant.Services.ShoppingCartAPI.Messages;
 using Restaurant.Services.ShoppingCartAPI.Models.Dtos;
 using Restaurant.Services.ShoppingCartAPI.Repository;
@@ -11,11 +12,13 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
     {
         private readonly ICartRepository _cartRepository;
         private readonly ResponseDto _responseDto;
+        private readonly IMessageBus _messageBus;
 
-        public CartController(ICartRepository cartRepository)
+        public CartController(ICartRepository cartRepository, IMessageBus messageBus)
         {
             _cartRepository = cartRepository;
             _responseDto = new ResponseDto();
+            _messageBus = messageBus;
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -127,6 +130,8 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
                 }
 
                 checkoutHeaderDto.CartDetails = cartDto.CartDetails;
+
+                await _messageBus.PublishMessage(checkoutHeaderDto, "checkouttopicmessage");
             }
             catch (Exception ex)
             {
