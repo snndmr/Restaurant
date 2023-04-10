@@ -109,6 +109,12 @@ namespace Restaurant.Web.Controllers
 
                 ResponseDto response = await _cartService.CheckoutAsync<ResponseDto>(cartDto.CartHeader, accessToken);
 
+                if (!response.IsSuccess)
+                {
+                    TempData["Error"] = response.DisplayMessage;
+                    return RedirectToAction(nameof(Checkout));
+                }
+
                 return RedirectToAction(nameof(Confirmation));
             }
             catch (Exception)

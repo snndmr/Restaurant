@@ -11,12 +11,14 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
     public class CartController : Controller
     {
         private readonly ICartRepository _cartRepository;
+        private readonly ICouponRepository _couponRepository;
         private readonly ResponseDto _responseDto;
         private readonly IMessageBus _messageBus;
 
-        public CartController(ICartRepository cartRepository, IMessageBus messageBus)
+        public CartController(ICartRepository cartRepository, ICouponRepository couponRepository, IMessageBus messageBus)
         {
             _cartRepository = cartRepository;
+            _couponRepository = couponRepository;
             _responseDto = new ResponseDto();
             _messageBus = messageBus;
         }
@@ -127,6 +129,20 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
                 if (cartDto == null)
                 {
                     return BadRequest();
+                }
+
+                if (!string.IsNullOrEmpty(checkoutHeaderDto.CouponCode))
+                {
+                    CouponDto couponDto = await _couponRepository.GetCoupon(checkoutHeaderDto.CouponCode);
+
+                    if (checkoutHeaderDto.DiscountTotal != couponDto.DiscountAmount)
+                    {
+                        _responseDto.IsSuccess = false;
+                        _responseDto.ErrorMessages = new List<string> { "Coupon Price has changed, please confirm" };
+                        _responseDto.DisplayMessage = "Coupon Price has changed, please confirm";
+
+                        return _responseDto;
+                    }
                 }
 
                 checkoutHeaderDto.CartDetails = cartDto.CartDetails;

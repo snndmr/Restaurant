@@ -89,6 +89,8 @@ namespace Restaurant.Services.ShoppingCartAPI.Repository
                 }
                 else
                 {
+                    cart.CartDetails.FirstOrDefault().Id = cartDetail.Id;
+                    cart.CartDetails.FirstOrDefault().CartHeaderId = cartHeader.Id;
                     cart.CartDetails.FirstOrDefault().Product = null;
                     cart.CartDetails.FirstOrDefault().Count += cartDetail.Count;
                     _dbContext.CartDetails.Update(cart.CartDetails.FirstOrDefault());
