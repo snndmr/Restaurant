@@ -148,6 +148,7 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
                 checkoutHeaderDto.CartDetails = cartDto.CartDetails;
 
                 await _messageBus.PublishMessage(checkoutHeaderDto, "checkouttopicmessage");
+                await _cartRepository.ClearCart(checkoutHeaderDto.UserId);
             }
             catch (Exception ex)
             {

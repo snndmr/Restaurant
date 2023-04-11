@@ -17,9 +17,11 @@ namespace Restaurant.Services.OrderAPI.Messaging
         private readonly string _serviceBusConnectionString;
         private readonly string _checkoutMessageTopic;
         private readonly string _paymentMessageTopic;
+        private readonly string _orderUpdatePaymentResultTopic;
         private readonly string _subscriptionCheckOut;
 
         private readonly ServiceBusProcessor _checkOutProcessor;
+        private readonly ServiceBusProcessor _orderUpdatePaymentStatusProcessor;
 
         public AzureServiceBusConsumer(OrderRepository orderRepository, IConfiguration configuration, IMessageBus messageBus)
         {
@@ -30,10 +32,12 @@ namespace Restaurant.Services.OrderAPI.Messaging
             _serviceBusConnectionString = _configuration.GetValue<string>("ServiceBusConnectionStrings");
             _checkoutMessageTopic = _configuration.GetValue<string>("CheckoutMessageTopic");
             _paymentMessageTopic = _configuration.GetValue<string>("OrderPaymentProcessTopic");
+            _orderUpdatePaymentResultTopic = _configuration.GetValue<string>("OrderUpdatePaymentResultTopic");
             _subscriptionCheckOut = _configuration.GetValue<string>("SubscriptionCheckOut");
 
             ServiceBusClient client = new ServiceBusClient(_serviceBusConnectionString);
             _checkOutProcessor = client.CreateProcessor(_checkoutMessageTopic, _subscriptionCheckOut);
+            _orderUpdatePaymentStatusProcessor = client.CreateProcessor(_orderUpdatePaymentResultTopic, _subscriptionCheckOut);
         }
 
         public async Task Start()
@@ -41,12 +45,19 @@ namespace Restaurant.Services.OrderAPI.Messaging
             _checkOutProcessor.ProcessMessageAsync += OnCheckOutMessageReceived;
             _checkOutProcessor.ProcessErrorAsync += ErrorHandler;
             await _checkOutProcessor.StartProcessingAsync();
+
+            _orderUpdatePaymentStatusProcessor.ProcessMessageAsync += OnOrderUpdatePaymentReceived;
+            _orderUpdatePaymentStatusProcessor.ProcessErrorAsync += ErrorHandler;
+            await _orderUpdatePaymentStatusProcessor.StartProcessingAsync();
         }
 
         public async Task Stop()
         {
             await _checkOutProcessor.StopProcessingAsync();
             await _checkOutProcessor.DisposeAsync();
+
+            await _orderUpdatePaymentStatusProcessor.StopProcessingAsync();
+            await _orderUpdatePaymentStatusProcessor.DisposeAsync();
         }
 
         private Task ErrorHandler(ProcessErrorEventArgs args)
@@ -115,6 +126,17 @@ namespace Restaurant.Services.OrderAPI.Messaging
             {
                 throw;
             }
+        }
+
+        private async Task OnOrderUpdatePaymentReceived(ProcessMessageEventArgs args)
+        {
+            ServiceBusReceivedMessage message = args.Message;
+            string body = Encoding.UTF8.GetString(message.Body);
+
+            UpdatePaymentResultMessage paymentResultMessage = JsonConvert.DeserializeObject<UpdatePaymentResultMessage>(body);
+
+            await _orderRepository.UpdateOrderPaymentStatus(paymentResultMessage.OrderId, paymentResultMessage.Status);
+            await args.CompleteMessageAsync(args.Message);
         }
     }
 }

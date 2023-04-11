@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentProcessor", "Payment
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Restaurant.Services.OrderAPI", "Restaurant.Services.OrderAPI\Restaurant.Services.OrderAPI.csproj", "{264549A9-4250-499B-8693-0B780F3FC457}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurant.Services.PaymentAPI", "Restaurant.Services.PaymentAPI\Restaurant.Services.PaymentAPI.csproj", "{D46FE407-3922-414F-B2E5-8105DF8958AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{264549A9-4250-499B-8693-0B780F3FC457}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{264549A9-4250-499B-8693-0B780F3FC457}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{264549A9-4250-499B-8693-0B780F3FC457}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D46FE407-3922-414F-B2E5-8105DF8958AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D46FE407-3922-414F-B2E5-8105DF8958AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D46FE407-3922-414F-B2E5-8105DF8958AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D46FE407-3922-414F-B2E5-8105DF8958AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{67973D8A-205A-4149-9E51-74E92917DAAD} = {023606B2-353C-48C6-B7AE-3FC8EF0522B6}
 		{2C9983AF-A738-47B9-B87C-355D6F767AB0} = {A49D0C39-4A61-44C4-9AB6-A7CCE4B403A3}
 		{264549A9-4250-499B-8693-0B780F3FC457} = {CD27F870-774D-4078-8ECA-31D894A43905}
+		{D46FE407-3922-414F-B2E5-8105DF8958AF} = {CD27F870-774D-4078-8ECA-31D894A43905}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DEE18158-305E-4C70-91DB-9F9E1B487E82}
