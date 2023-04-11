@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
+using Restaurant.MessageBus;
 using Restaurant.OrderAPI.Messages;
 using Restaurant.OrderAPI.Models;
 using Restaurant.OrderAPI.Repository;
@@ -11,20 +12,24 @@ namespace Restaurant.OrderAPI.Messaging
     {
         private readonly OrderRepository _orderRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMessageBus _messageBus;
 
         private readonly string _serviceBusConnectionString;
         private readonly string _checkoutMessageTopic;
+        private readonly string _paymentMessageTopic;
         private readonly string _subscriptionCheckOut;
 
         private readonly ServiceBusProcessor _checkOutProcessor;
 
-        public AzureServiceBusConsumer(OrderRepository orderRepository, IConfiguration configuration)
+        public AzureServiceBusConsumer(OrderRepository orderRepository, IConfiguration configuration, IMessageBus messageBus)
         {
             _orderRepository = orderRepository;
             _configuration = configuration;
+            _messageBus = messageBus;
 
             _serviceBusConnectionString = _configuration.GetValue<string>("ServiceBusConnectionStrings");
             _checkoutMessageTopic = _configuration.GetValue<string>("CheckoutMessageTopic");
+            _paymentMessageTopic = _configuration.GetValue<string>("OrderPaymentProcessTopic");
             _subscriptionCheckOut = _configuration.GetValue<string>("SubscriptionCheckOut");
 
             ServiceBusClient client = new ServiceBusClient(_serviceBusConnectionString);
@@ -90,6 +95,26 @@ namespace Restaurant.OrderAPI.Messaging
             }
 
             await _orderRepository.AddOrder(orderHeader);
+
+            PaymentRequestMessage paymentRequestMessage = new()
+            {
+                OrderId = orderHeader.OrderHeaderId,
+                Name = $"{orderHeader.FirstName} {orderHeader.LastName}",
+                CardNumber = orderHeader.CardNumber,
+                CVV = orderHeader.CVV,
+                ExpiryMonthYear = orderHeader.ExpiryMonthYear,
+                OrderTotal = orderHeader.OrderTotal
+            };
+
+            try
+            {
+                await _messageBus.PublishMessage(paymentRequestMessage, _paymentMessageTopic);
+                await args.CompleteMessageAsync(args.Message);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

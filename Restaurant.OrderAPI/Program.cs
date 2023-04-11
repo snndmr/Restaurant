@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Restaurant.MessageBus;
 using Restaurant.OrderAPI.DbContexts;
 using Restaurant.OrderAPI.Extensions;
 using Restaurant.OrderAPI.Messaging;
@@ -75,6 +76,7 @@ namespace Restaurant.OrderAPI
             var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
             builder.Services.AddSingleton(new OrderRepository(optionBuilder.Options));
+            builder.Services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
 
             builder.Services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
 
