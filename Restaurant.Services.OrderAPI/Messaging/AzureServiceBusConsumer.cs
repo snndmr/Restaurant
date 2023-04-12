@@ -114,7 +114,8 @@ namespace Restaurant.Services.OrderAPI.Messaging
                 CardNumber = orderHeader.CardNumber,
                 CVV = orderHeader.CVV,
                 ExpiryMonthYear = orderHeader.ExpiryMonthYear,
-                OrderTotal = orderHeader.OrderTotal
+                OrderTotal = orderHeader.OrderTotal,
+                Email = orderHeader.EmailAddress
             };
 
             try
