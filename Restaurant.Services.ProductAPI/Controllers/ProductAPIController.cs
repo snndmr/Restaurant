@@ -38,7 +38,6 @@ namespace Restaurant.Services.ProductAPI.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [Authorize]
         public async Task<object> Get(int id)
         {
             try
