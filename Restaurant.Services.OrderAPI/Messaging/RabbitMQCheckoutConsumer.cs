@@ -3,6 +3,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Restaurant.Services.OrderAPI.Messages;
 using Restaurant.Services.OrderAPI.Models;
+using Restaurant.Services.OrderAPI.RabbitMQSender;
 using Restaurant.Services.OrderAPI.Repository;
 using System.Text;
 
@@ -13,10 +14,12 @@ namespace Restaurant.Services.OrderAPI.Messaging
         private readonly OrderRepository _orderRepository;
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private readonly IRabbitMQOrderMessageSender _rabbitMessageSender;
 
-        public RabbitMQCheckoutConsumer(OrderRepository orderRepository)
+        public RabbitMQCheckoutConsumer(OrderRepository orderRepository, IRabbitMQOrderMessageSender rabbitMessageSender)
         {
             _orderRepository = orderRepository;
+            _rabbitMessageSender = rabbitMessageSender;
 
             ConnectionFactory connectionFactory = new()
             {
@@ -35,11 +38,11 @@ namespace Restaurant.Services.OrderAPI.Messaging
             stoppingToken.ThrowIfCancellationRequested();
 
             EventingBasicConsumer consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ch, ea) =>
+            consumer.Received += async (ch, ea) =>
             {
                 string content = Encoding.UTF8.GetString(ea.Body.ToArray());
                 CheckoutHeaderDto checkoutHeaderDto = JsonConvert.DeserializeObject<CheckoutHeaderDto>(content);
-                HandleMessage(checkoutHeaderDto);
+                await HandleMessage(checkoutHeaderDto);
 
                 _channel.BasicAck(ea.DeliveryTag, false);
             };
@@ -100,6 +103,7 @@ namespace Restaurant.Services.OrderAPI.Messaging
             {
                 //await _messageBus.PublishMessage(paymentRequestMessage, _paymentMessageTopic);
                 //await args.CompleteMessageAsync(args.Message);
+                _rabbitMessageSender.SendMessage(paymentRequestMessage, "orderpaymentprocesstopic");
             }
             catch (Exception)
             {

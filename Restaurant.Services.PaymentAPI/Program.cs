@@ -2,6 +2,7 @@ using PaymentProcessor;
 using Restaurant.MessageBus;
 using Restaurant.Services.PaymentAPI.Extensions;
 using Restaurant.Services.PaymentAPI.Messaging;
+using Restaurant.Services.PaymentAPI.RabbitMQSender;
 
 namespace Restaurant.Services.PaymentAPI
 {
@@ -17,6 +18,8 @@ namespace Restaurant.Services.PaymentAPI
             builder.Services.AddSingleton<IProcessPayment, ProcessPayment>();
             builder.Services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
             builder.Services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
+            builder.Services.AddSingleton<IRabbitMQPaymentMessageSender, RabbitMQPaymentMessageSender>();
+            builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

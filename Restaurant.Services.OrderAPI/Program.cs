@@ -6,6 +6,7 @@ using Restaurant.Repository;
 using Restaurant.Services.OrderAPI.DbContexts;
 using Restaurant.Services.OrderAPI.Extensions;
 using Restaurant.Services.OrderAPI.Messaging;
+using Restaurant.Services.OrderAPI.RabbitMQSender;
 using Restaurant.Services.OrderAPI.Repository;
 
 namespace Restaurant.Services.OrderAPI
@@ -80,6 +81,7 @@ namespace Restaurant.Services.OrderAPI
             builder.Services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
 
             builder.Services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
+            builder.Services.AddSingleton<IRabbitMQOrderMessageSender, RabbitMQOrderMessageSender>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
