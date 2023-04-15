@@ -2,6 +2,7 @@
 using Restaurant.MessageBus;
 using Restaurant.Services.ShoppingCartAPI.Messages;
 using Restaurant.Services.ShoppingCartAPI.Models.Dtos;
+using Restaurant.Services.ShoppingCartAPI.RabbitMQSender;
 using Restaurant.Services.ShoppingCartAPI.Repository;
 
 namespace Restaurant.Services.ShoppingCartAPI.Controllers
@@ -14,13 +15,15 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
         private readonly ICouponRepository _couponRepository;
         private readonly ResponseDto _responseDto;
         private readonly IMessageBus _messageBus;
+        private readonly IRabbitMQCartMessageSender _rabbitMQCartMessageSender;
 
-        public CartController(ICartRepository cartRepository, ICouponRepository couponRepository, IMessageBus messageBus)
+        public CartController(ICartRepository cartRepository, ICouponRepository couponRepository, IMessageBus messageBus, IRabbitMQCartMessageSender rabbitMQCartMessageSender)
         {
             _cartRepository = cartRepository;
             _couponRepository = couponRepository;
             _responseDto = new ResponseDto();
             _messageBus = messageBus;
+            _rabbitMQCartMessageSender = rabbitMQCartMessageSender;
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -147,7 +150,10 @@ namespace Restaurant.Services.ShoppingCartAPI.Controllers
 
                 checkoutHeaderDto.CartDetails = cartDto.CartDetails;
 
-                await _messageBus.PublishMessage(checkoutHeaderDto, "checkouttopicmessage");
+                /* Azure Service Bus */
+                //await _messageBus.PublishMessage(checkoutHeaderDto, "checkouttopicmessage");
+                /* RabbitMQ */
+                _rabbitMQCartMessageSender.SendMessage(checkoutHeaderDto, "checkoutqueue");
                 await _cartRepository.ClearCart(checkoutHeaderDto.UserId);
             }
             catch (Exception ex)

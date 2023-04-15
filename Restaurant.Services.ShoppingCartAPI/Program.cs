@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Restaurant.MessageBus;
 using Restaurant.Services.ShoppingCartAPI;
 using Restaurant.Services.ShoppingCartAPI.DbContexts;
+using Restaurant.Services.ShoppingCartAPI.RabbitMQSender;
 using Restaurant.Services.ShoppingCartAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +65,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 builder.Services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
+builder.Services.AddSingleton<IRabbitMQCartMessageSender, RabbitMQCartMessageSender>();
 builder.Services.AddHttpClient<ICouponRepository, CouponRepository>(u => u.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ServiceUrls:CouponAPI")));
 
 var app = builder.Build();

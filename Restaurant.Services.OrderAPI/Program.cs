@@ -2,11 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Restaurant.MessageBus;
+using Restaurant.Repository;
 using Restaurant.Services.OrderAPI.DbContexts;
 using Restaurant.Services.OrderAPI.Extensions;
 using Restaurant.Services.OrderAPI.Messaging;
 using Restaurant.Services.OrderAPI.Repository;
-using Restaurant.Repository;
 
 namespace Restaurant.Services.OrderAPI
 {
@@ -71,6 +71,7 @@ namespace Restaurant.Services.OrderAPI
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
