@@ -1,14 +1,14 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
-using Restaurant.Repository;
 using Restaurant.Services.Email.Messages;
+using Restaurant.Services.Email.Repository;
 using System.Text;
 
 namespace Restaurant.Services.Email.Messaging
 {
     public class AzureServiceBusConsumer : IAzureServiceBusConsumer
     {
-        private readonly IEmailRepository _emailRepository;
+        private readonly EmailRepository _emailRepository;
         private readonly IConfiguration _configuration;
 
         private readonly string _serviceBusConnectionString;
@@ -17,7 +17,7 @@ namespace Restaurant.Services.Email.Messaging
 
         private readonly ServiceBusProcessor _orderUpdatePaymentStatusProcessor;
 
-        public AzureServiceBusConsumer(IEmailRepository emailRepository, IConfiguration configuration)
+        public AzureServiceBusConsumer(EmailRepository emailRepository, IConfiguration configuration)
         {
             _emailRepository = emailRepository;
             _configuration = configuration;

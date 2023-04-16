@@ -73,6 +73,7 @@ namespace Restaurant.Services.OrderAPI
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
+            builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()

@@ -15,14 +15,16 @@ namespace Restaurant.Services.Email
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Singleton);
-            builder.Services.AddSingleton<IEmailRepository, EmailRepository>();
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 
             var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            builder.Services.AddSingleton(new EmailRepository(optionBuilder.Options));
             builder.Services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
-            builder.Services.AddControllers();
+            builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
 
+            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
